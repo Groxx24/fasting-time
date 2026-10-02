@@ -15,7 +15,7 @@ shows the phase while the app is closed. Built with Compose Multiplatform. Singl
 | `app/src/commonMain` | Everything shared: UI, ViewModels, domain, data. New code goes here by default. |
 | `app/src/androidMain` | `MainActivity`, the manifest, launcher resources and platform implementations. |
 | `app/src/iosMain` | `MainViewController` (called from Swift) and platform implementations. |
-| `iosApp/` | A thin SwiftUI shell that hosts the shared UI. No app logic in Swift. |
+| `iosApp/` | A thin SwiftUI shell that hosts the shared UI, and the `PhaseActivity` widget extension that draws the Live Activity. No app logic in Swift. |
 
 Common code must not use `java.*` or `android.*`. When a platform API is needed, put an interface
 in `commonMain` next to its caller and implement it in `Xxx.android.kt` and `Xxx.ios.kt` (see
@@ -56,7 +56,8 @@ Rules that follow from this:
 ## Technologies
 
 - **Compose Multiplatform** for all UI, shared by both platforms. No XML layouts, no Fragments,
-  no SwiftUI screens.
+  no SwiftUI screens. The one exception is the Live Activity, which the system renders outside
+  the app and so has to be SwiftUI.
 - **Kotlin Coroutines and Flow** for all async work. `suspend` functions for one-shot calls, `Flow`
   for observed data, `viewModelScope` in ViewModels. No callbacks, no RxJava, no LiveData.
 - **`kotlin.time`** (`Clock`, `Instant`, `Duration`) for all time. The opt-in it still needs in
@@ -101,10 +102,20 @@ platform object to build (the `FastingWindowStore`, the `TimeZoneRepository`, th
   notification is ongoing from Android 14, where the user can still swipe it away; before that
   it is a plain one. A phase whose notification the user removed is remembered by the moment it
   ends and not shown again; the next phase is. `MainActivity` asks for the permission.
-- iOS: there is no notification that stays and updates itself, and a Live Activity can't last a
-  whole fast or start by itself. So two local notifications repeat daily, one when each phase
-  begins, and wait in Notification Center until removed. Opening the app clears the one about
-  the phase that is over. Changing the window replaces both.
+- iOS shows the phase in two ways, because neither is enough alone (`LockScreenPhaseNotifier`):
+  - A Live Activity counts down on the Lock Screen and in the Dynamic Island. Only the open app
+    can start one, and the system ends it eight hours later, so it covers that long after the app
+    was last opened and not a whole fast. It is given the phase after the current one too, and
+    turns to it by itself when the current one ends (that is its stale date). If the user removes
+    it, it stays away until the next phase.
+  - Two local notifications repeat daily, one when each phase begins, and wait in Notification
+    Center until removed. They need no app running, so they still come when the Live Activity
+    is gone. Opening the app clears the one about the phase that is over.
+- Kotlin cannot reach ActivityKit. `PhaseLiveActivity` (`iosMain`) is the interface the notifier
+  talks to; `LiveActivityController.swift` implements it and is passed to `MainViewController`.
+  The words and the moments are still worked out in Kotlin. `iosApp/Shared/` holds the
+  `PhaseAttributes` both Swift targets compile; `iosApp/PhaseActivity/` is the widget extension,
+  bundle id `com.fasting.time.PhaseActivity`.
 
 ## Build
 
@@ -118,8 +129,8 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 ```
 
 To run on iOS, open `iosApp/iosApp.xcodeproj` in Xcode (16 or newer); its build phase calls Gradle
-to build the shared framework. Set `TEAM_ID` in `iosApp/Configuration/Config.xcconfig` to run on a
-device.
+to build the shared framework. The deployment target is iOS 16.2, the first with the Live Activity
+API used here. Set `TEAM_ID` in `iosApp/Configuration/Config.xcconfig` to run on a device.
 
 Library versions in `gradle/libs.versions.toml` are pinned on purpose: this setup is limited to
 Android Gradle Plugin 8.13 and compile SDK 36, and newer Compose Multiplatform releases need
