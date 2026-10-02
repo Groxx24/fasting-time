@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A fork and a knife side by side, inside the 66-unit safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Both are drawn one unit tall around their own centre, then scaled up into place. -->
+    <group
+        android:scaleX="52"
+        android:scaleY="52"
+        android:translateX="44"
+        android:translateY="54">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M-0.093,-0.5h0.036v0.27h-0.036zM-0.018,-0.5h0.036v0.27h-0.036zM0.057,-0.5h0.036v0.27h-0.036zM-0.093,-0.25L0.093,-0.25L0.093,-0.17C0.093,-0.08 0.035,-0.08 0.035,-0.02L0.035,0.5L-0.035,0.5L-0.035,-0.02C-0.035,-0.08 -0.093,-0.08 -0.093,-0.17Z" />
+    </group>
+    <group
+        android:scaleX="52"
+        android:scaleY="52"
+        android:translateX="64"
+        android:translateY="54">
+        <path
+            android:fillColor="#FFFB923C"
+            android:pathData="M-0.04,0.5L-0.04,-0.5C0.06,-0.42 0.085,-0.2 0.075,0.07L0.04,0.07L0.04,0.5Z" />
+    </group>
+</vector>

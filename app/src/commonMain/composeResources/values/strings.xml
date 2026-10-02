@@ -1,0 +1,10 @@
+<resources>
+    <string name="phase_fasting">Fasting</string>
+    <string name="phase_eating">Eating</string>
+    <string name="phase_none">Ready when you are</string>
+    <string name="caption_fasting">No eating for now</string>
+    <string name="caption_eating">Enjoy your food</string>
+    <string name="caption_none">Start your fast when you finish eating</string>
+    <string name="start_fasting">Start fasting</string>
+    <string name="start_eating">Start eating</string>
+</resources>
