@@ -7,7 +7,7 @@ import com.fasting.time.resources.duration_minutes
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration
 
-/** Hours, minutes and seconds, two digits each. The hours keep counting past a day. */
+/** Hours, minutes and seconds, two digits each. */
 internal fun Duration.toTimerText(): String =
     toComponents { hours, minutes, seconds, _ ->
         listOf(hours, minutes, seconds).joinToString(":") { it.toString().padStart(2, '0') }

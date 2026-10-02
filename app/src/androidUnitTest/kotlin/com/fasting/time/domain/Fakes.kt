@@ -1,8 +1,7 @@
 package com.fasting.time.domain
 
-import com.fasting.time.data.phase.PhaseStore
-import com.fasting.time.data.phase.SavedPhase
-import com.fasting.time.data.session.SessionLogStore
+import com.fasting.time.data.window.FastingWindowStore
+import com.fasting.time.data.window.SavedWindow
 import com.fasting.time.domain.repository.TimeZoneRepository
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -15,19 +14,11 @@ class FakeClock(var now: Instant = Start) : Clock {
     override fun now(): Instant = now
 }
 
-class FakePhaseStore(private var saved: SavedPhase? = null) : PhaseStore {
-    override fun read(): SavedPhase? = saved
+class FakeFastingWindowStore(private var saved: SavedWindow? = null) : FastingWindowStore {
+    override fun read(): SavedWindow? = saved
 
-    override fun write(phase: SavedPhase) {
-        saved = phase
-    }
-}
-
-class FakeSessionLogStore(var log: String? = null) : SessionLogStore {
-    override fun read(): String? = log
-
-    override fun write(log: String) {
-        this.log = log
+    override fun write(window: SavedWindow) {
+        saved = window
     }
 }
 

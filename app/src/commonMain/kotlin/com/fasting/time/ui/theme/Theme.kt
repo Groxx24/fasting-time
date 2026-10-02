@@ -16,12 +16,6 @@ val FeastColors = listOf(Color(0xFFEA580C), Color(0xFFDB2777), Color(0xFF9D174D)
 /** The ring and bar of the no-eating sign. */
 val Forbidden = Color(0xFFF87171)
 
-/** Fasting figures in the history. */
-val FastingTint = Color(0xFFC7D2FE)
-
-/** Eating figures in the history. */
-val EatingTint = Color(0xFFFED7AA)
-
 private val Night = NightColors.first()
 
 private val FastingColorScheme = darkColorScheme(

@@ -33,7 +33,7 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 /**
- * What fills the screen behind every tab. While eating, forks and knives fly up a warm sky.
+ * What fills the screen behind everything else. While eating, forks and knives fly up a warm sky.
  * While fasting, they hang still and faint in a night sky behind a no-eating sign.
  */
 @Composable

@@ -1,15 +1,11 @@
 package com.fasting.time.di
 
-import com.fasting.time.data.phase.PhaseStore
-import com.fasting.time.data.repository.StoredFastingRepository
-import com.fasting.time.data.repository.StoredSessionRepository
-import com.fasting.time.data.session.SessionLogStore
-import com.fasting.time.domain.repository.FastingRepository
-import com.fasting.time.domain.repository.SessionRepository
+import com.fasting.time.data.repository.StoredFastingWindowRepository
+import com.fasting.time.data.window.FastingWindowStore
+import com.fasting.time.domain.repository.FastingWindowRepository
 import com.fasting.time.domain.repository.TimeZoneRepository
 import com.fasting.time.domain.usecase.ObserveFastingTimerUseCase
-import com.fasting.time.domain.usecase.ObserveHistoryUseCase
-import com.fasting.time.domain.usecase.StartPhaseUseCase
+import com.fasting.time.domain.usecase.SetFastingWindowUseCase
 import kotlin.time.Clock
 
 /**
@@ -17,19 +13,16 @@ import kotlin.time.Clock
  * Each platform creates a single instance and hands in what only it can build.
  */
 class AppContainer(
-    phaseStore: PhaseStore,
-    sessionLogStore: SessionLogStore,
+    fastingWindowStore: FastingWindowStore,
     timeZoneRepository: TimeZoneRepository,
 ) {
     private val clock: Clock = Clock.System
-    private val fastingRepository: FastingRepository by lazy { StoredFastingRepository(phaseStore) }
-    private val sessionRepository: SessionRepository by lazy {
-        StoredSessionRepository(sessionLogStore)
+    private val fastingWindowRepository: FastingWindowRepository by lazy {
+        StoredFastingWindowRepository(fastingWindowStore)
     }
 
-    val observeFastingTimer by lazy { ObserveFastingTimerUseCase(fastingRepository, clock) }
-    val startPhase by lazy { StartPhaseUseCase(fastingRepository, sessionRepository, clock) }
-    val observeHistory by lazy {
-        ObserveHistoryUseCase(sessionRepository, timeZoneRepository, clock)
+    val observeFastingTimer by lazy {
+        ObserveFastingTimerUseCase(fastingWindowRepository, timeZoneRepository, clock)
     }
+    val setFastingWindow by lazy { SetFastingWindowUseCase(fastingWindowRepository) }
 }

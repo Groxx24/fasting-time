@@ -1,75 +1,17 @@
 <resources>
-    <string name="tab_timer">Timer</string>
-    <string name="tab_history">History</string>
-
     <string name="phase_fasting">Fasting</string>
     <string name="phase_eating">Eating</string>
-    <string name="phase_none">Ready when you are</string>
-    <string name="caption_fasting">No eating for now</string>
-    <string name="caption_eating">Enjoy your food</string>
-    <string name="caption_none">Start your fast when you finish eating</string>
-    <string name="start_fasting">Start fasting</string>
-    <string name="start_eating">Start eating</string>
+    <string name="caption_fasting">until you eat at %1$s</string>
+    <string name="caption_eating">until the fast starts at %1$s</string>
+    <string name="change_window">Fasting %1$s – %2$s · Change</string>
 
-    <string name="record_title">Longest fast</string>
-    <string name="record_none">Your first finished fast sets the record.</string>
-    <string name="record_current">Current fast: %1$s</string>
-    <string name="record_to_go">%1$s to beat it</string>
-    <string name="record_beaten">New record, and still counting</string>
-    <string name="history_empty">Finished fasts and meals show up here, day by day.</string>
-    <string name="grouping_week">Weeks</string>
-    <string name="grouping_month">Months</string>
-    <string name="period_this_week">This week</string>
-    <string name="period_last_week">Last week</string>
-    <string name="period_week_range">%1$s – %2$s</string>
-    <string name="period_month">%1$s %2$s</string>
-    <string name="day_and_month">%1$s %2$s</string>
-    <string name="weekday_and_day">%1$s %2$s</string>
-    <string name="stat_longest_fast">Longest fast</string>
-    <string name="stat_average_fast">Average fast</string>
-    <string name="stat_average_eating">Average eating</string>
-    <string name="column_fasting">Fasting</string>
-    <string name="column_eating">Eating</string>
+    <string name="setup_title">When do you fast?</string>
+    <string name="setup_explanation">Every day between these times. The timer only follows the clock; keeping to it is up to you.</string>
+    <string name="setup_start">Fast from</string>
+    <string name="setup_end">until</string>
+    <string name="setup_summary">%1$s fasting, %2$s eating</string>
+    <string name="setup_confirm">Done</string>
+
     <string name="duration_hours_minutes">%1$sh %2$sm</string>
     <string name="duration_minutes">%1$sm</string>
-    <string name="duration_none">–</string>
-
-    <string-array name="month_names">
-        <item>January</item>
-        <item>February</item>
-        <item>March</item>
-        <item>April</item>
-        <item>May</item>
-        <item>June</item>
-        <item>July</item>
-        <item>August</item>
-        <item>September</item>
-        <item>October</item>
-        <item>November</item>
-        <item>December</item>
-    </string-array>
-    <string-array name="month_names_short">
-        <item>Jan</item>
-        <item>Feb</item>
-        <item>Mar</item>
-        <item>Apr</item>
-        <item>May</item>
-        <item>Jun</item>
-        <item>Jul</item>
-        <item>Aug</item>
-        <item>Sep</item>
-        <item>Oct</item>
-        <item>Nov</item>
-        <item>Dec</item>
-    </string-array>
-    <!-- From Monday, the day a week starts on in the history. -->
-    <string-array name="weekday_names_short">
-        <item>Mon</item>
-        <item>Tue</item>
-        <item>Wed</item>
-        <item>Thu</item>
-        <item>Fri</item>
-        <item>Sat</item>
-        <item>Sun</item>
-    </string-array>
 </resources>
