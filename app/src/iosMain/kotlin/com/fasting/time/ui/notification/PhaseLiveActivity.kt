@@ -12,7 +12,10 @@ interface PhaseLiveActivity {
     fun start(current: LiveActivityPhase, next: LiveActivityPhase)
 }
 
-/** One phase as the Live Activity shows it: its words and the moment its countdown reaches zero. */
+/**
+ * One phase as the Live Activity shows it: the [title] above the countdown, the [caption] below
+ * it and the moment it reaches zero.
+ */
 class LiveActivityPhase(
     val isFasting: Boolean,
     val title: String,

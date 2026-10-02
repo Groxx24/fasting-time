@@ -38,8 +38,8 @@ import com.fasting.time.resources.Res
 import com.fasting.time.resources.caption_eating
 import com.fasting.time.resources.caption_fasting
 import com.fasting.time.resources.change_window
-import com.fasting.time.resources.phase_eating
-import com.fasting.time.resources.phase_fasting
+import com.fasting.time.resources.countdown_eating
+import com.fasting.time.resources.countdown_fasting
 import com.fasting.time.ui.components.panel
 import com.fasting.time.ui.format.toClockText
 import com.fasting.time.ui.format.toTimerText
@@ -92,8 +92,8 @@ private fun Readout(timer: FastingTimer, modifier: Modifier = Modifier) {
         Text(
             text = stringResource(
                 when (timer.phase) {
-                    FastingPhase.Fasting -> Res.string.phase_fasting
-                    FastingPhase.Eating -> Res.string.phase_eating
+                    FastingPhase.Fasting -> Res.string.countdown_fasting
+                    FastingPhase.Eating -> Res.string.countdown_eating
                 },
             ).uppercase(),
             style = ReadoutStyle.copy(fontSize = 20.sp, letterSpacing = 4.sp),
@@ -113,7 +113,7 @@ private fun Readout(timer: FastingTimer, modifier: Modifier = Modifier) {
             softWrap = false,
             autoSize = TextAutoSize.StepBased(minFontSize = 32.sp, maxFontSize = 128.sp),
         )
-        // What the time above counts down to.
+        // The phase it is now, and the time on the clock at which the countdown reaches zero.
         Text(
             text = when (timer.phase) {
                 FastingPhase.Fasting ->

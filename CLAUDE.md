@@ -84,6 +84,8 @@ platform object to build (the `FastingWindowStore`, the `TimeZoneRepository`, th
   right after the app was closed or the phone restarted, so nothing runs in the background. Take
   the time through the injected `Clock`, never `Clock.System` directly, so tests can set it.
 - The timer counts down: to the end of the window while fasting, to its start while eating.
+  The line above it names what the countdown leads to ("Eating in", "Fasting in"), and the line
+  below it the phase it is now and until when. The notifications use the same words.
 - `ObserveFastingTimerUseCase` emits once a second, only while collected.
 - There is no date library. The only thing asked of the platform is the offset from UTC
   (`TimeZoneRepository`), which turns the clock's instant into local time since midnight. Times

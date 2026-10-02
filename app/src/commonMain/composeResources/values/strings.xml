@@ -1,8 +1,9 @@
 <resources>
-    <string name="phase_fasting">Fasting</string>
-    <string name="phase_eating">Eating</string>
-    <string name="caption_fasting">until you eat at %1$s</string>
-    <string name="caption_eating">until the fast starts at %1$s</string>
+    <!-- Above the countdown: what the time left leads to, which is the other phase. -->
+    <string name="countdown_fasting">Eating in</string>
+    <string name="countdown_eating">Fasting in</string>
+    <string name="caption_fasting">Fasting until %1$s</string>
+    <string name="caption_eating">Eating until %1$s</string>
     <string name="change_window">Fasting %1$s – %2$s · Change</string>
 
     <string name="notification_channel">Fasting or eating</string>

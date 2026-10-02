@@ -59,8 +59,8 @@ class LockScreenPhaseNotifier(private val liveActivity: PhaseLiveActivity) : Pha
         val text = phaseNotificationText(phase, window)
         return LiveActivityPhase(
             isFasting = phase == FastingPhase.Fasting,
-            title = text.title,
-            caption = text.body,
+            title = text.label,
+            caption = text.caption,
             endsAtEpochSeconds = endsAt.epochSeconds.toDouble(),
         )
     }
@@ -71,10 +71,9 @@ class LockScreenPhaseNotifier(private val liveActivity: PhaseLiveActivity) : Pha
 
         val window = timer.window
         for (phase in FastingPhase.entries) {
-            val text = phaseNotificationText(phase, window)
+            // Only the caption: the label is for a countdown, which a plain notification has not.
             val content = UNMutableNotificationContent().apply {
-                setTitle(text.title)
-                setBody(text.body)
+                setTitle(phaseNotificationText(phase, window).caption)
             }
             val begins = if (phase == FastingPhase.Fasting) window.start else window.end
             val time = NSDateComponents().apply {

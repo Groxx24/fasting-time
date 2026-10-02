@@ -54,8 +54,9 @@ class SystemPhaseNotifier(private val context: Context) : PhaseNotifier {
         val text = phaseNotificationText(timer.phase, timer.window)
         val notification = Notification.Builder(context, ChannelId)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(text.title)
-            .setContentText(text.body)
+            .setContentTitle(text.caption)
+            // In the header, right before the countdown, so the two read as one line.
+            .setSubText(text.label)
             .setWhen(endsAtMillis)
             .setUsesChronometer(true)
             .setChronometerCountDown(true)
