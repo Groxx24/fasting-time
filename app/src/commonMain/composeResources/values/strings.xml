@@ -5,6 +5,8 @@
     <string name="caption_eating">until the fast starts at %1$s</string>
     <string name="change_window">Fasting %1$s – %2$s · Change</string>
 
+    <string name="notification_channel">Fasting or eating</string>
+
     <string name="setup_title">When do you fast?</string>
     <string name="setup_explanation">Every day between these times. The timer only follows the clock; keeping to it is up to you.</string>
     <string name="setup_start">Fast from</string>

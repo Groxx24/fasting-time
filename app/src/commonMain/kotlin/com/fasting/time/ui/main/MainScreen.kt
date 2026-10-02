@@ -33,7 +33,11 @@ import kotlin.time.Duration.Companion.minutes
 @Composable
 fun MainRoute(container: AppContainer) {
     val viewModel = viewModel {
-        MainViewModel(container.observeFastingTimer, container.setFastingWindow)
+        MainViewModel(
+            container.observeFastingTimer,
+            container.setFastingWindow,
+            container.showPhaseNotification,
+        )
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var isChangingWindow by rememberSaveable { mutableStateOf(false) }

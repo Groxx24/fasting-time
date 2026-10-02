@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- A clock face: a ring with the hands at four o'clock. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2a10,10 0,1 0,0 20a10,10 0,1 0,0 -20zM12,20a8,8 0,1 1,0 -16a8,8 0,1 1,0 16zM11,7h2v4.6l3.2,1.9l-1,1.7l-4.2,-2.5z" />
+</vector>

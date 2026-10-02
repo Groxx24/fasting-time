@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.time.Clock
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -32,7 +31,8 @@ class ObserveFastingTimerUseCase(
             } else {
                 flow {
                     while (true) {
-                        val timer = window.timerAt(localTimeSinceMidnight())
+                        val now = clock.now()
+                        val timer = window.timerAt(now, timeZoneRepository.utcOffsetAt(now))
                         emit(timer)
                         // Wake when the next whole second is gone, so the seconds never skip.
                         val intoSecond = timer.remaining - timer.remaining.inWholeSeconds.seconds
@@ -41,14 +41,4 @@ class ObserveFastingTimerUseCase(
                 }
             }
         }
-
-    private fun localTimeSinceMidnight(): Duration {
-        val now = clock.now()
-        val local = now + timeZoneRepository.utcOffsetAt(now)
-        return local.toEpochMilliseconds().mod(MillisPerDay).milliseconds
-    }
-
-    private companion object {
-        const val MillisPerDay = 86_400_000L
-    }
 }

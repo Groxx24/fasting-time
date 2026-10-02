@@ -2,10 +2,12 @@ package com.fasting.time.di
 
 import com.fasting.time.data.repository.StoredFastingWindowRepository
 import com.fasting.time.data.window.FastingWindowStore
+import com.fasting.time.domain.notification.PhaseNotifier
 import com.fasting.time.domain.repository.FastingWindowRepository
 import com.fasting.time.domain.repository.TimeZoneRepository
 import com.fasting.time.domain.usecase.ObserveFastingTimerUseCase
 import com.fasting.time.domain.usecase.SetFastingWindowUseCase
+import com.fasting.time.domain.usecase.ShowPhaseNotificationUseCase
 import kotlin.time.Clock
 
 /**
@@ -14,6 +16,7 @@ import kotlin.time.Clock
  */
 class AppContainer(
     fastingWindowStore: FastingWindowStore,
+    phaseNotifier: PhaseNotifier,
     timeZoneRepository: TimeZoneRepository,
 ) {
     private val clock: Clock = Clock.System
@@ -25,4 +28,7 @@ class AppContainer(
         ObserveFastingTimerUseCase(fastingWindowRepository, timeZoneRepository, clock)
     }
     val setFastingWindow by lazy { SetFastingWindowUseCase(fastingWindowRepository) }
+    val showPhaseNotification by lazy {
+        ShowPhaseNotificationUseCase(fastingWindowRepository, timeZoneRepository, phaseNotifier, clock)
+    }
 }

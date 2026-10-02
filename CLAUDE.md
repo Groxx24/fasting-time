@@ -4,9 +4,9 @@ An intermittent fasting timer for Android and iOS. The first screen asks for the
 every day, from one time on the clock until another. After that the app shows which phase it is by
 that window (fasting or eating) and the hours, minutes and seconds left of it, as big text in the
 middle of the screen on an animated backdrop that shows the phase. The app only follows the clock:
-it never asks whether the user really started or stopped, and keeps no record. Built with Compose
-Multiplatform. Single Gradle module `:app`, package `com.fasting.time`, plus the Xcode host project
-in `iosApp/`.
+it never asks whether the user really started or stopped, and keeps no record. A notification
+shows the phase while the app is closed. Built with Compose Multiplatform. Single Gradle module
+`:app`, package `com.fasting.time`, plus the Xcode host project in `iosApp/`.
 
 ## Source sets
 
@@ -66,8 +66,8 @@ Not decided yet: dependency injection, navigation, persistence, and anything els
 library for these without asking first. Until then, dependencies are wired by hand in
 `di/AppContainer.kt` and nowhere else. Each platform creates one container
 (`FastingTimeApplication`, `MainViewController`), passing in the few dependencies that need a
-platform object to build (the `FastingWindowStore`, the `TimeZoneRepository`), and routes build
-their ViewModel from it with `viewModel { … }`.
+platform object to build (the `FastingWindowStore`, the `TimeZoneRepository`, the
+`PhaseNotifier`), and routes build their ViewModel from it with `viewModel { … }`.
 
 ## Timer
 
@@ -87,6 +87,24 @@ their ViewModel from it with `viewModel { … }`.
 - There is no date library. The only thing asked of the platform is the offset from UTC
   (`TimeZoneRepository`), which turns the clock's instant into local time since midnight. Times
   are shown on a 24-hour clock on both platforms.
+
+## Notification
+
+- `PhaseNotifier` (`domain/notification/`) is the one thing the domain asks for; each platform
+  implements it in `ui/notification/`, with the words shared in `PhaseNotificationText.kt` so
+  they match the timer screen. `ShowPhaseNotificationUseCase` works out the phase and the moment
+  it ends and hands them over. `MainViewModel` calls it at launch and after a window is chosen.
+- Nothing of the app keeps running for it. Each platform leaves the waiting to the system.
+- Android: one silent notification that counts down and times out when the phase ends. An inexact
+  alarm for that moment wakes `PhaseNotificationReceiver`, which calls the use case again; so do
+  a restart and a change of the clock or time zone, which lose or move the alarm. The
+  notification is ongoing from Android 14, where the user can still swipe it away; before that
+  it is a plain one. A phase whose notification the user removed is remembered by the moment it
+  ends and not shown again; the next phase is. `MainActivity` asks for the permission.
+- iOS: there is no notification that stays and updates itself, and a Live Activity can't last a
+  whole fast or start by itself. So two local notifications repeat daily, one when each phase
+  begins, and wait in Notification Center until removed. Opening the app clears the one about
+  the phase that is over. Changing the window replaces both.
 
 ## Build
 

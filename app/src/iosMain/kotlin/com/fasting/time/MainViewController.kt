@@ -4,12 +4,14 @@ import androidx.compose.ui.window.ComposeUIViewController
 import com.fasting.time.data.repository.DeviceTimeZoneRepository
 import com.fasting.time.data.window.UserDefaultsFastingWindowStore
 import com.fasting.time.di.AppContainer
+import com.fasting.time.ui.notification.UserNotificationsPhaseNotifier
 import platform.UIKit.UIViewController
 
 // Lives as long as the process, so it outlives any single view controller.
 private val container by lazy {
     AppContainer(
         fastingWindowStore = UserDefaultsFastingWindowStore(),
+        phaseNotifier = UserNotificationsPhaseNotifier(),
         timeZoneRepository = DeviceTimeZoneRepository(),
     )
 }

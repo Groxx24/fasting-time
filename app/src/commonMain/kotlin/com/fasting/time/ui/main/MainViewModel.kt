@@ -6,6 +6,7 @@ import com.fasting.time.domain.model.FastingPhase
 import com.fasting.time.domain.model.FastingWindow
 import com.fasting.time.domain.usecase.ObserveFastingTimerUseCase
 import com.fasting.time.domain.usecase.SetFastingWindowUseCase
+import com.fasting.time.domain.usecase.ShowPhaseNotificationUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -24,13 +25,22 @@ data class MainUiState(
 class MainViewModel(
     observeFastingTimer: ObserveFastingTimerUseCase,
     private val setFastingWindow: SetFastingWindowUseCase,
+    private val showPhaseNotification: ShowPhaseNotificationUseCase,
 ) : ViewModel() {
+    init {
+        // Alarms and notifications can be lost while the app is closed, so set them up again.
+        viewModelScope.launch { showPhaseNotification() }
+    }
+
     val uiState: StateFlow<MainUiState> =
         observeFastingTimer()
             .map { timer -> MainUiState(isLoading = false, timer?.window, timer?.phase) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), MainUiState())
 
     fun setWindow(window: FastingWindow) {
-        viewModelScope.launch { setFastingWindow(window) }
+        viewModelScope.launch {
+            setFastingWindow(window)
+            showPhaseNotification()
+        }
     }
 }

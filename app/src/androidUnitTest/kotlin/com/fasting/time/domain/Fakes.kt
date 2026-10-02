@@ -2,6 +2,8 @@ package com.fasting.time.domain
 
 import com.fasting.time.data.window.FastingWindowStore
 import com.fasting.time.data.window.SavedWindow
+import com.fasting.time.domain.model.FastingTimer
+import com.fasting.time.domain.notification.PhaseNotifier
 import com.fasting.time.domain.repository.TimeZoneRepository
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -19,6 +21,15 @@ class FakeFastingWindowStore(private var saved: SavedWindow? = null) : FastingWi
 
     override fun write(window: SavedWindow) {
         saved = window
+    }
+}
+
+class FakePhaseNotifier : PhaseNotifier {
+    /** Every phase shown so far, with the moment it ends. */
+    val shown = mutableListOf<Pair<FastingTimer, Instant>>()
+
+    override suspend fun show(timer: FastingTimer, endsAt: Instant) {
+        shown += timer to endsAt
     }
 }
 
