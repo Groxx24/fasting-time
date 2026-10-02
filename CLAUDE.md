@@ -1,8 +1,9 @@
 # Fasting Time
 
-A one-screen intermittent fasting timer for Android and iOS: hours, minutes and seconds of the
-phase under way (fasting or eating) as big text in the middle of the screen, on an animated
-backdrop that shows which phase it is, with a button to start the other phase. Built with Compose
+An intermittent fasting timer for Android and iOS, in two tabs. Timer: hours, minutes and seconds
+of the phase under way (fasting or eating) as big text in the middle of the screen, on an animated
+backdrop that shows which phase it is, with a button to start the other phase. History: every
+finished fast and meal, summed up by day and grouped by week or month. Built with Compose
 Multiplatform. Single Gradle module `:app`, package `com.fasting.time`, plus the Xcode host project
 in `iosApp/`.
 
@@ -24,7 +25,7 @@ in `commonMain` next to its caller and implement it in `Xxx.android.kt` and `Xxx
 Follow SOLID, MVVM and Clean Architecture. Every feature goes through the same four layers:
 
 ```
-UI (Compose)  →  ViewModel  →  Use case  →  Repository  →  data source (phase store)
+UI (Compose)  →  ViewModel  →  Use case  →  Repository  →  data source (stores)
 ```
 
 Dependencies point inward only: `ui` → `domain` ← `data`. The `domain` package must not import
@@ -36,7 +37,7 @@ Android, Compose or any platform API.
 | ViewModel | `ui/<feature>/` | Holds one immutable `UiState` as `StateFlow`, turns UI events into use-case calls. Talks only to use cases. |
 | Use case | `domain/usecase/` | One business action per class, exposed as `operator fun invoke`. Talks only to repository interfaces. |
 | Repository | interface in `domain/repository/`, implementation in `data/repository/` | The single source of truth for a kind of data. Maps stored values to domain models. |
-| Data source | `data/phase/` | `PhaseStore` and the per-platform storage behind it. |
+| Data source | `data/phase/`, `data/session/` | `PhaseStore`, `SessionLogStore` and the per-platform storage behind them. |
 
 Rules that follow from this:
 
@@ -70,14 +71,32 @@ platform object to build (the `PhaseStore`), and routes build their ViewModel fr
 
 - There are two phases, `Fasting` and `Eating`. Starting one ends the other; before the first tap
   there is none, and the screen offers only "Start fasting". There is always exactly one button.
-- The only thing saved is the phase under way and the moment it began (`PhaseStore`:
-  `SharedPreferences` on Android, `NSUserDefaults` on iOS). Finished phases are not kept yet; a
-  log of sessions is the planned next step.
+- The phase under way and the moment it began are saved in `PhaseStore` (`SharedPreferences` on
+  Android, `NSUserDefaults` on iOS).
 - The time shown is always the wall clock minus the saved start, never a counter that ticks in
   memory. That is what keeps it right after the app was closed or the phone restarted, so nothing
   runs in the background. Take the time through the injected `Clock`, never `Clock.System`
   directly, so tests can set it.
 - `ObserveFastingTimerUseCase` emits once a second, only while collected.
+
+## History
+
+- `StartPhaseUseCase` puts the phase it ends in the log as a `Session` (phase, start, end). A
+  phase shorter than a minute is taken for a tap by mistake and is not logged.
+- The log is one string in `SessionLogStore` (the same key-value storage as the phase), written
+  whole on every change; `StoredSessionRepository` owns the format. That is enough for a few
+  sessions a day. No persistence library is chosen, so moving it to a database means replacing
+  that repository and nothing else.
+- `ObserveHistoryUseCase` does all the summing up. A session counts for the local day it ended
+  on. A day keeps its longest fast, so a fast broken early doesn't hide a longer one, and adds up
+  its eating. Days are grouped into weeks, which start on Monday, or months.
+- The record is the longest fast ever finished. The History tab compares the fast under way to
+  it, and shows that one in the record's place once it is longer.
+- There is no date library. `Day` (`domain/model/`) turns days since 1970 into a calendar date
+  itself, and the only thing asked of the platform is the offset from UTC (`TimeZoneRepository`).
+  Month and weekday names are string arrays in the resources.
+- `scripts/seed-sample-history.sh android|ios` fills the emulator's or the booted simulator's
+  log with sample sessions, replacing what is there, so the History tab has something to show.
 
 ## Build
 
@@ -102,9 +121,13 @@ plugin 9.1+ and SDK 37. Do not bump them without upgrading the toolchain as a wh
 
 - The app is always dark, in both system themes. Colours live in `ui/theme/Theme.kt`; the system
   bars are forced to match in `MainActivity` and in `iosApp/iosApp/Info.plist`.
+- `MainScreen` (`ui/main/`) owns the backdrop, the safe-area padding and the tab bar. A tab's
+  screen draws only its own content. The two tabs are plain state there, not a navigation graph.
+- Anything drawn over the backdrop other than the timer sits on `Modifier.panel`
+  (`ui/components/Panel.kt`), which keeps text readable over both skies.
 - The backdrop (`ui/fasting/FastingBackdrop.kt`) is drawn on one `Canvas` with no image assets:
   the fork and the knife are `Path`s. Its animation values are read in the draw phase only, so a
   frame repaints without recomposing; keep it that way.
 - User-visible text goes in `commonMain/composeResources/values/strings.xml`; read it through the
-  generated `Res` class (`com.fasting.time.resources`). Format arguments must be positional
-  (`%1$d`, `%2$s`). Only what the Android manifest needs stays in `androidMain/res`.
+  generated `Res` class (`com.fasting.time.resources`), and shared icons go in
+  `composeResources/drawable/`. Format arguments must be positional (`%1$d`, `%2$s`). Only what the Android manifest needs stays in `androidMain/res`.

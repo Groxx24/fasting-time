@@ -33,18 +33,25 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 /**
- * What fills the screen behind the timer. While eating, forks and knives fly up a warm sky.
+ * What fills the screen behind every tab. While eating, forks and knives fly up a warm sky.
  * While fasting, they hang still and faint in a night sky behind a no-eating sign.
  */
 @Composable
-fun FastingBackdrop(phase: FastingPhase?, modifier: Modifier = Modifier) {
+fun FastingBackdrop(
+    phase: FastingPhase?,
+    /** False where the sign would sit behind something other than the timer. */
+    showSign: Boolean,
+    /** The part of the backdrop the timer is in the middle of, read while drawing. */
+    signBounds: () -> Rect?,
+    modifier: Modifier = Modifier,
+) {
     val feast = animateFloatAsState(
         targetValue = if (phase == FastingPhase.Eating) 1f else 0f,
         animationSpec = tween(PhaseChangeMillis),
         label = "feast",
     )
     val forbidden = animateFloatAsState(
-        targetValue = if (phase == FastingPhase.Fasting) 1f else 0f,
+        targetValue = if (phase == FastingPhase.Fasting && showSign) 1f else 0f,
         animationSpec = tween(PhaseChangeMillis),
         label = "forbidden",
     )
@@ -72,7 +79,7 @@ fun FastingBackdrop(phase: FastingPhase?, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier.fillMaxSize()) {
         drawSky(feast.value)
         drawUtensils(fork, knife, flight.doubleValue, feast.value)
-        drawNoEatingSign(fork, knife, forbidden.value, time.doubleValue)
+        signBounds()?.let { drawNoEatingSign(fork, knife, it, forbidden.value, time.doubleValue) }
     }
 }
 
@@ -103,9 +110,16 @@ private fun wrap(position: Double, extent: Float, margin: Float): Float =
     (position.mod(extent + 2.0 * margin) - margin).toFloat()
 
 /** A fork and a knife inside a red ring with a bar across it, breathing slowly. */
-private fun DrawScope.drawNoEatingSign(fork: Path, knife: Path, strength: Float, time: Double) {
+private fun DrawScope.drawNoEatingSign(
+    fork: Path,
+    knife: Path,
+    bounds: Rect,
+    strength: Float,
+    time: Double,
+) {
     if (strength == 0f) return
-    val radius = size.minDimension * 0.4f
+    val center = bounds.center
+    val radius = bounds.minDimension * 0.42f
     val length = radius * 1.25f
     for ((path, side) in listOf(fork to -1f, knife to 1f)) {
         withTransform({
@@ -119,7 +133,7 @@ private fun DrawScope.drawNoEatingSign(fork: Path, knife: Path, strength: Float,
     val breath = 0.5f + 0.5f * sin(time * 2 * PI / BreathSeconds).toFloat()
     val alpha = (0.2f + 0.12f * breath) * strength
     val thickness = radius * 0.1f
-    drawCircle(Forbidden, radius, alpha = alpha, style = Stroke(thickness))
+    drawCircle(Forbidden, radius, center, alpha = alpha, style = Stroke(thickness))
     // From the ring's top left to its bottom right, stopping where the bar meets the ring.
     val reach = radius * cos(PI / 4).toFloat()
     drawLine(

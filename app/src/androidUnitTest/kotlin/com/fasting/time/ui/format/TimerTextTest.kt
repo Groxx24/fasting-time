@@ -1,4 +1,4 @@
-package com.fasting.time.ui.fasting
+package com.fasting.time.ui.format
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

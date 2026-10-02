@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
@@ -28,7 +27,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,12 +42,9 @@ import com.fasting.time.resources.phase_fasting
 import com.fasting.time.resources.phase_none
 import com.fasting.time.resources.start_eating
 import com.fasting.time.resources.start_fasting
-import com.fasting.time.ui.theme.FastingTimeTheme
+import com.fasting.time.ui.format.toTimerText
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun FastingRoute(container: AppContainer, modifier: Modifier = Modifier) {
@@ -60,49 +55,41 @@ fun FastingRoute(container: AppContainer, modifier: Modifier = Modifier) {
     FastingScreen(state = state, onStart = viewModel::start, modifier = modifier)
 }
 
-/** The timer in the middle of a backdrop that shows the phase, and a button to start the next one. */
+/** The timer in the middle of its tab, over the sign, and a button to start the next phase. */
 @Composable
 fun FastingScreen(
     state: FastingUiState,
     onStart: (FastingPhase) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        FastingBackdrop(phase = state.phase)
-        if (!state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .safeDrawingPadding()
-                    .padding(24.dp),
-            ) {
-                // The timer stays in the middle of the screen, over the sign, so it keeps clear
-                // of the button by leaving its height free both below and above itself.
-                var buttonHeight by remember { mutableIntStateOf(0) }
-                val clearance = with(LocalDensity.current) { buttonHeight.toDp() } + 16.dp
-                Readout(
-                    phase = state.phase,
-                    elapsed = state.elapsed,
-                    modifier = Modifier.align(Alignment.Center).padding(vertical = clearance),
-                )
-                // The one thing to do next: end a fast by eating, otherwise begin a fast. That
-                // covers the first launch too, when nothing is under way yet.
-                val next =
-                    if (state.phase == FastingPhase.Fasting) FastingPhase.Eating else FastingPhase.Fasting
-                StartButton(
-                    text = stringResource(
-                        when (next) {
-                            FastingPhase.Fasting -> Res.string.start_fasting
-                            FastingPhase.Eating -> Res.string.start_eating
-                        },
-                    ),
-                    onClick = { onStart(next) },
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .onSizeChanged { buttonHeight = it.height },
-                )
-            }
-        }
+    // Nothing until the saved phase has been read, so the first frame doesn't guess.
+    if (state.isLoading) return
+    Box(modifier = modifier.fillMaxSize().padding(24.dp)) {
+        // The timer stays in the middle of the tab, over the sign, so it keeps clear
+        // of the button by leaving its height free both below and above itself.
+        var buttonHeight by remember { mutableIntStateOf(0) }
+        val clearance = with(LocalDensity.current) { buttonHeight.toDp() } + 16.dp
+        Readout(
+            phase = state.phase,
+            elapsed = state.elapsed,
+            modifier = Modifier.align(Alignment.Center).padding(vertical = clearance),
+        )
+        // The one thing to do next: end a fast by eating, otherwise begin a fast. That
+        // covers the first launch too, when nothing is under way yet.
+        val next =
+            if (state.phase == FastingPhase.Fasting) FastingPhase.Eating else FastingPhase.Fasting
+        StartButton(
+            text = stringResource(
+                when (next) {
+                    FastingPhase.Fasting -> Res.string.start_fasting
+                    FastingPhase.Eating -> Res.string.start_eating
+                },
+            ),
+            onClick = { onStart(next) },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .onSizeChanged { buttonHeight = it.height },
+        )
     }
 }
 
@@ -150,12 +137,6 @@ private fun Readout(phase: FastingPhase?, elapsed: Duration, modifier: Modifier 
     }
 }
 
-/** Hours, minutes and seconds, two digits each. The hours keep counting past a day. */
-internal fun Duration.toTimerText(): String =
-    toComponents { hours, minutes, seconds, _ ->
-        listOf(hours, minutes, seconds).joinToString(":") { it.toString().padStart(2, '0') }
-    }
-
 /** White stays readable over both skies. */
 @Composable
 private fun StartButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
@@ -183,33 +164,3 @@ private val ReadoutStyle = TextStyle(
     // Keeps white text readable when a utensil or the bar of the sign passes behind it.
     shadow = Shadow(color = Color.Black.copy(alpha = 0.35f), blurRadius = 24f),
 )
-
-@Preview
-@Composable
-private fun FastingScreenFastingPreview() {
-    FastingTimeTheme {
-        FastingScreen(
-            state = FastingUiState(
-                isLoading = false,
-                phase = FastingPhase.Fasting,
-                elapsed = 14.hours + 7.minutes + 32.seconds,
-            ),
-            onStart = {},
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun FastingScreenEatingPreview() {
-    FastingTimeTheme {
-        FastingScreen(
-            state = FastingUiState(
-                isLoading = false,
-                phase = FastingPhase.Eating,
-                elapsed = 2.hours + 45.minutes + 9.seconds,
-            ),
-            onStart = {},
-        )
-    }
-}
